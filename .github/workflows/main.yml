@@ -1,0 +1,45 @@
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+      - base
+      - advanced
+      - nobug
+      - bug
+  push:
+    branches:
+      - main
+      - master
+      - develop
+      - base 
+      - advanced
+      - nobug
+      - bug
+name: "Build & Release"
+jobs:
+  build:
+    name: Build & Release
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '12.x'
+      - uses: subosito/flutter-action@v2
+        with:
+          # flutter-version: '3.0.5'
+          channel: 'stable'
+      - run: flutter --version
+      - run: flutter pub get
+      # - run: flutter pub run flutter_native_splash:create
+      # - run: flutter pub run flutter_launcher_icons
+      - run: flutter build apk --release --split-per-abi
+      - name: Push to Releases
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "build/app/outputs/flutter-apk/*"
+          tag: v1.0.${{ github.run_number }}
+          token: ${{ secrets.TOKEN }}
+
+ 
