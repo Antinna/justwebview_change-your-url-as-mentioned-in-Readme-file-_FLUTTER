@@ -56,12 +56,10 @@ class WebViewScreen extends GetView<WebViewController> {
                 child: Stack(
               children: [
                 InAppWebView(
-                   initialOptions: InAppWebViewGroupOptions(
-                      crossPlatform: InAppWebViewOptions(
-                         
-                          useOnDownloadStart: true
-                      ),
-                    ),
+                  initialOptions: InAppWebViewGroupOptions(
+                    crossPlatform:
+                        InAppWebViewOptions(useOnDownloadStart: true),
+                  ),
                   // initialSettings:InAppWebViewSettings(),
                   pullToRefreshController: controller.refreshController,
                   onLoadStop: (onLoadStopcontroller, url) {
@@ -114,13 +112,15 @@ class WebViewScreen extends GetView<WebViewController> {
                     }
                     return NavigationActionPolicy.ALLOW;
                   },
-                  onDownloadStart:(controller, url) async {
-                      final taskId = await FlutterDownloader.enqueue(
-                        url: url.toString(),
-                        savedDir: (await getExternalStorageDirectory())!.path,
-                        showNotification: true, // show download progress in status bar (for Android)
-                        openFileFromNotification: true, // click on notification to open downloaded file (for Android)
-                      );
+                  onDownloadStart: (controller, url) async {
+                    final taskId = await FlutterDownloader.enqueue(
+                      url: url.toString(),
+                      savedDir: (await getExternalStorageDirectory())!.path,
+                      showNotification:
+                          true, // show download progress in status bar (for Android)
+                      openFileFromNotification:
+                          true, // click on notification to open downloaded file (for Android)
+                    );
                   },
 //                   onReceivedServerTrustAuthRequest: (controller, challenge) async {
 //   return ServerTrustAuthResponse(action: ServerTrustAuthResponseAction.PROCEED);
@@ -180,33 +180,46 @@ class WebViewScreen extends GetView<WebViewController> {
                         request.url; //error page is designed use that
                     onReceivedErrorcontroller.loadData(data: """ 
       <!DOCTYPE html>
-      <html lang="en">
-      <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-          <meta http-equiv="X-UA-Compatible" content="ie=edge">
-          <style>
-          ${await InAppWebViewController.tRexRunnerCss}
-          </style>
-          <style>
-          .interstitial-wrapper {
-          box-sizing: border-box;
-          font-size: 1em;
-          line-height: 1.6em;
-          margin: 0 auto 0;
-          max-width: 600px;
-          width: 100%;
-          }
-          </style>
-      </head>
-      <body>
-          ${await InAppWebViewController.tRexRunnerHtml}
-          <div class="interstitial-wrapper">
-        <h1>Website not available</h1>
-        <p>Could not load web pages at <strong>$errorUrl</strong> because:</p>
-        <p>${error.description}</p>
-          </div>
-      </body>
+      
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error: No Internet Connection</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+        }
+        h1 {
+            color: #dc3545;
+        }
+        p {
+            color: #6c757d;
+        }
+        .icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">🚫</div>
+        <h1>Error: No Internet Connection</h1>
+        <p>Sorry, it seems that you are not connected to the internet. Please check your connection and try again.</p>
+    </div>
+</body>
+</html>
           """, baseUrl: errorUrl, historyUrl: errorUrl);
                   },
 
@@ -247,7 +260,6 @@ class WebViewScreen extends GetView<WebViewController> {
                             ? PermissionResponseAction.DENY
                             : PermissionResponseAction.GRANT);
                   },
-                  
 
                   initialUrlRequest:
                       URLRequest(url: WebUri(controller.initialUrl.toString())),
